@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – BK Analytics{% endblock %}
+{% block content %}
+<h2 class="fw-bold mb-4"><i class="bi bi-bar-chart-fill text-danger"></i> Analytics Dashboard</h2>
+
+<div class="row g-4">
+  {% for chart_json in charts %}
+  <div class="col-12 col-xl-6">
+    <div class="card shadow-sm">
+      <div class="card-body p-2">
+        <div id="chart{{ loop.index }}" style="height:380px;"></div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  var chartData = {{ charts | tojson }};
+  chartData.forEach(function(json_str, i) {
+    var fig = JSON.parse(json_str);
+    Plotly.newPlot('chart' + (i + 1), fig.data, fig.layout,
+                   {responsive: true, displayModeBar: false});
+  });
+</script>
+{% endblock %}

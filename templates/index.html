@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Home – BK Analytics{% endblock %}
+{% block page_title %}Home{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<!-- Hero -->
+<div class="hero-section">
+  <div class="hero-badge">🔥 AI-Powered Analytics</div>
+  <h1 class="hero-title">Burger King<br><span class="hero-accent">Data Analytics</span></h1>
+  <p class="hero-sub">Explore customer reviews, menu nutrition & order insights powered by Google Gemini</p>
+</div>
+
+<!-- KPI Cards -->
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fff7ed;color:#f97316"><i class="bi bi-chat-quote-fill"></i></div>
+      <div class="kpi-value">{{ stats.reviews }}</div>
+      <div class="kpi-label">Total Reviews</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fef9c3;color:#ca8a04"><i class="bi bi-star-fill"></i></div>
+      <div class="kpi-value">{{ stats.avg_rating }}</div>
+      <div class="kpi-label">Avg Rating</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#f0fdf4;color:#22c55e"><i class="bi bi-emoji-smile-fill"></i></div>
+      <div class="kpi-value">{{ stats.positive_pct }}</div>
+      <div class="kpi-label">Positive Sentiment</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#eff6ff;color:#3b82f6"><i class="bi bi-geo-alt-fill"></i></div>
+      <div class="kpi-value">{{ stats.locations }}</div>
+      <div class="kpi-label">Locations</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fdf4ff;color:#a855f7"><i class="bi bi-burger"></i></div>
+      <div class="kpi-value">{{ stats.products }}</div>
+      <div class="kpi-label">Products</div>
+    </div>
+  </div>
+  <div class="col-6 col-md-4 col-xl-2">
+    <div class="kpi-card">
+      <div class="kpi-icon" style="background:#fff1f2;color:#f43f5e"><i class="bi bi-bag-check-fill"></i></div>
+      <div class="kpi-value">{{ stats.orders }}</div>
+      <div class="kpi-label">Total Orders</div>
+    </div>
+  </div>
+</div>
+
+<!-- Feature Cards -->
+<h5 class="section-title mb-3">Explore</h5>
+<div class="row g-3">
+  <div class="col-md-6 col-xl-3">
+    <a href="{{ url_for('dashboard') }}" class="feature-card">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#f97316,#fb923c)">
+        <i class="bi bi-bar-chart-fill"></i>
+      </div>
+      <h5>Dashboard</h5>
+      <p>Interactive Plotly charts — ratings, sentiment trends, top products & revenue</p>
+      <div class="feature-arrow"><i class="bi bi-arrow-right-circle-fill"></i></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <a href="{{ url_for('chat_review') }}" class="feature-card">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#f59e0b,#fbbf24)">
+        <i class="bi bi-star-fill"></i>
+      </div>
+      <h5>Review Chat</h5>
+      <p>Ask questions about 2,000 customer reviews — ratings, sentiment, locations</p>
+      <div class="feature-arrow"><i class="bi bi-arrow-right-circle-fill"></i></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <a href="{{ url_for('chat_menu') }}" class="feature-card">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#22c55e,#4ade80)">
+        <i class="bi bi-egg-fried"></i>
+      </div>
+      <h5>Menu Chat</h5>
+      <p>Explore nutrition data — calories, protein, fat, carbs & more</p>
+      <div class="feature-arrow"><i class="bi bi-arrow-right-circle-fill"></i></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-xl-3">
+    <a href="{{ url_for('chat_order') }}" class="feature-card">
+      <div class="feature-icon" style="background:linear-gradient(135deg,#3b82f6,#60a5fa)">
+        <i class="bi bi-bag-fill"></i>
+      </div>
+      <h5>Order Chat</h5>
+      <p>Analyse revenue, delivery times, top-selling items & customer ratings</p>
+      <div class="feature-arrow"><i class="bi bi-arrow-right-circle-fill"></i></div>
+    </a>
+  </div>
+</div>
+{% endblock %}
