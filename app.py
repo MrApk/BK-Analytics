@@ -37,16 +37,44 @@ orders_df = pd.read_csv(ORDER_CSV, parse_dates=["order_datetime"]) if os.path.ex
 
 MODEL = "gemini-3.5-flash-lite"
 
-# ── Lazy embeddings ───────────────────────────────────────────────────────────
-_embedder = _emb = None
+# ── Lightweight TF-IDF index (replaces sentence-transformers: no torch, tiny) ─
+_STOP = set("""a an and are as at be but by for from had has have he her his i if in into is it its
+me my of on or our she so than that the their them then there they this to was we were what when
+which who will with you your very just really also got get""".split())
+_tfidf = None   # (vocab dict, idf array, normalized matrix)
+
+def _tokens(text):
+    return [w for w in re.findall(r"[a-z0-9']+", str(text).lower()) if w not in _STOP and len(w) > 1]
 
 def _ensure_embeddings():
-    global _embedder, _emb
-    if _emb is None:
-        from sentence_transformers import SentenceTransformer
-        _embedder = SentenceTransformer("all-MiniLM-L6-v2")
-        _emb = _embedder.encode(reviews_df["review_text"].tolist(),
-                                normalize_embeddings=True, show_progress_bar=False)
+    global _tfidf
+    if _tfidf is not None:
+        return
+    docs = [_tokens(t) for t in reviews_df["review_text"]]
+    vocab = {}
+    for d in docs:
+        for w in d:
+            vocab.setdefault(w, len(vocab))
+    tf = np.zeros((len(docs), len(vocab)), dtype=np.float32)
+    for i, d in enumerate(docs):
+        for w in d:
+            tf[i, vocab[w]] += 1
+    df = (tf > 0).sum(axis=0)
+    idf = (np.log((1 + len(docs)) / (1 + df)) + 1).astype(np.float32)
+    mat = np.log1p(tf) * idf
+    norms = np.linalg.norm(mat, axis=1, keepdims=True)
+    norms[norms == 0] = 1
+    _tfidf = (vocab, idf, mat / norms)
+
+def _query_vec(query):
+    vocab, idf, _ = _tfidf
+    v = np.zeros(len(vocab), dtype=np.float32)
+    for w in _tokens(query):
+        if w in vocab:
+            v[vocab[w]] += 1
+    v = np.log1p(v) * idf
+    n = np.linalg.norm(v)
+    return v / n if n else v
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TOOL FUNCTIONS
@@ -100,7 +128,7 @@ def get_stats(product:Optional[str]=None, location:Optional[str]=None,
 def search_reviews(query:str, product:Optional[str]=None, location:Optional[str]=None,
                    order_type:Optional[str]=None, sentiment:Optional[str]=None,
                    min_rating:Optional[int]=None, max_rating:Optional[int]=None, k:int=8) -> list:
-    """Semantic search over review text.
+    """Keyword (TF-IDF) search over review text.
     Args:
         query: Natural-language search query.
         product: Optional product filter.
@@ -115,8 +143,11 @@ def search_reviews(query:str, product:Optional[str]=None, location:Optional[str]
     sub = _filter_reviews(product, location, order_type, sentiment, min_rating, max_rating)
     if not len(sub): return []
     idx = sub.index.to_numpy()
-    q   = _embedder.encode([query], normalize_embeddings=True)[0]
-    top = idx[np.argsort(-(_emb[idx] @ q))[:min(int(k),15)]]
+    q   = _query_vec(query)
+    scores = _tfidf[2][idx] @ q
+    order  = np.argsort(-scores)[:min(int(k),15)]
+    top    = idx[order[scores[order] > 0]]
+    if not len(top): return []
     rows = reviews_df.loc[top, ["review_id","review_date","location","product_reviewed","order_type","rating","review_text"]].copy()
     rows["review_date"] = rows["review_date"].dt.strftime("%Y-%m-%d")
     return rows.to_dict("records")
