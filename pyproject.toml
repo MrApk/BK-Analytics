@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bk-analytics"
+version = "0.1.0"
+description = "Burger King analytics dashboard with Gemini-powered chat over reviews, menu and orders"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.0",
+    "pandas>=2.2.0",
+    "numpy>=1.26.0",
+    "plotly>=5.22.0",
+    "google-genai>=1.0.0",
+    "sentence-transformers>=2.5.1",
+    "python-dotenv>=1.0.1",
+    "requests>=2.31.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+]
+
+[tool.setuptools]
+py-modules = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
