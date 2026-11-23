@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "bk-analytics"
-version = "0.1.0"
+version = "0.2.0"
 description = "Burger King analytics dashboard with Gemini-powered chat over reviews, menu and orders"
 requires-python = ">=3.10"
 dependencies = [
@@ -16,6 +16,7 @@ dependencies = [
     "sentence-transformers>=2.5.1",
     "python-dotenv>=1.0.1",
     "requests>=2.31.0",
+    "gunicorn>=22.0.0",
 ]
 
 [project.optional-dependencies]
